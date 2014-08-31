@@ -3238,7 +3238,9 @@ static void __init tegra14_dfll_cpu_late_init(struct clk *c)
 
 		use_dfll = CONFIG_TEGRA_USE_DFLL_RANGE;
 		tegra_dvfs_set_dfll_range(cpu->dvfs, use_dfll);
+#ifdef CONFIG_DEBUG_FS
 		tegra_cl_dvfs_debug_init(c);
+#endif
 		pr_info("Tegra CPU DFLL is initialized\n");
 	}
 #endif
@@ -5805,7 +5807,7 @@ static struct clk tegra_dfll_cpu = {
 	.flags     = DFLL,
 	.ops       = &tegra_dfll_ops,
 	.reg	   = 0x2f4,
-	.max_rate  = 2116500000UL,
+	.max_rate  = 2014500000UL,
 };
 
 /* Audio sync clocks */
@@ -6053,7 +6055,7 @@ static struct clk tegra_clk_cclk_g = {
 	.inputs	= mux_cclk_g,
 	.reg	= 0x368,
 	.ops	= &tegra_super_ops,
-	.max_rate = 2116500000UL,
+	.max_rate = 2014500000UL,
 };
 
 static struct clk tegra_clk_cclk_lp = {
@@ -6078,7 +6080,7 @@ static struct clk tegra_clk_virtual_cpu_g = {
 	.name      = "cpu_g",
 	.parent    = &tegra_clk_cclk_g,
 	.ops       = &tegra_cpu_ops,
-	.max_rate  = 2116500000UL,
+	.max_rate  = 2014500000UL,
 	.u.cpu = {
 		.main      = &tegra_pll_x,
 		.backup    = &tegra_pll_p_out4,
@@ -6112,7 +6114,7 @@ static struct clk tegra_clk_cpu_cmplx = {
 	.name      = "cpu",
 	.inputs    = mux_cpu_cmplx,
 	.ops       = &tegra_cpu_cmplx_ops,
-	.max_rate  = 2116500000UL,
+	.max_rate  = 2014500000UL,
 };
 
 static struct clk tegra_clk_cop = {

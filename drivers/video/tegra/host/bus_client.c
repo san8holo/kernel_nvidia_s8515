@@ -1099,8 +1099,10 @@ int nvhost_client_device_init(struct platform_device *dev)
 	/* store the pointer to this device for channel */
 	ch->dev = dev;
 
+#ifdef CONFIG_DEBUG_FS
 	/* Create debugfs directory for the device */
 	nvhost_device_debug_init(dev);
+#endif
 
 	err = nvhost_channel_init(ch, nvhost_master, pdata->index);
 	if (err)

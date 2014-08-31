@@ -552,6 +552,28 @@ void rebuild_tegra_lcm(struct LCM_setting_table *init_table,struct tegra_dsi_out
 	//check(pdata->dsi_init_cmd,init_count);
 }	
 
+
+void rebuild_tegra_lcm_suspend(struct LCM_setting_table *init_table,struct tegra_dsi_out * pdata ,u16 init_count)
+{
+	if(!pdata->dsi_suspend_cmd){
+		pdata->dsi_suspend_cmd = create_tegra_dsi_cmd(init_table,init_count);
+	}
+	if(!pdata->n_suspend_cmd){
+		pdata->n_suspend_cmd = init_count;
+	}
+}
+
+void rebuild_tegra_lcm_resume(struct LCM_setting_table *init_table,struct tegra_dsi_out * pdata ,u16 init_count)
+{
+	if(!pdata->dsi_late_resume_cmd){
+		pdata->dsi_late_resume_cmd = create_tegra_dsi_cmd(init_table,init_count);
+	}
+	if(!pdata->n_late_resume_cmd){
+		pdata->n_late_resume_cmd = init_count;
+	}
+}
+
+
 #endif
 
 void tegra_dc_clk_enable(struct tegra_dc *dc)
@@ -606,6 +628,7 @@ void tegra_dc_release_dc_out(struct tegra_dc *dc)
 	print(data, buff);				      \
 	} while (0)
 
+#ifdef DEBUG
 static void _dump_regs(struct tegra_dc *dc, void *data,
 		       void (* print)(void *data, const char *str))
 {
@@ -783,6 +806,10 @@ static void _dump_regs(struct tegra_dc *dc, void *data,
 	tegra_dc_put(dc);
 	mutex_unlock(&dc->lock);
 }
+#else
+static void _dump_regs(struct tegra_dc *dc, void *data,
+		       void (* print)(void *data, const char *str)){}
+#endif
 
 #undef DUMP_REG
 

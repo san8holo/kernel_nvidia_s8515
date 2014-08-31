@@ -45,15 +45,15 @@ static struct regulator *vdd_lcd_s_1v8;
 static struct regulator *vdd_sys_bl_3v7;
 static struct regulator *avdd_lcd_3v0_2v8;
 
-static bool dsi_hx8394a_720p_reg_requested;
-static bool dsi_hx8394a_720p_gpio_requested = 0;
+static bool dsi_hx8394a_720p_p4_reg_requested;
+static bool dsi_hx8394a_720p_p4_gpio_requested = 0;
 static bool is_bl_powered;
 static bool is_in_initialized_mode;
 static struct platform_device *disp_device;
 
 static struct LCM_setting_table lcm_initialization_setting[] = {
 
-#if 1  //p3
+#if 0  //p3
         {0xB9, 3, {0xFF,0x83,0x94}},
         {0xBA, 16,{0x13,0x82,0x00,0x16,0xC5,0x40,//6th 00
                     0x10,0xFF,0x0F,0x24,0x03,0x21,
@@ -62,9 +62,9 @@ static struct LCM_setting_table lcm_initialization_setting[] = {
         {0xB2, 6, {0x00,0xC8,0x08,0x04,0x00,0x22}},
         
         {0xB4, 22,{0x80,0x06,0x32,0x10,0x03,0x32,0x15,0x08,0x32,0x10,0x08,0x33,0x04,0x43,0x05,0x37,0x04,0x43,0x06,0x61,0x61,0x06}},
-        {0xBF, 4, {0x06,0x02,0x10,0x04}},
+        {0xBF, 4, {0x06,0x00,0x10,0x04}},
         {0xC0, 2, {0x0C,0x17}},
-        {0xB6, 1, {0x08}},
+        {0xB6, 1, {0x0b}},
 
 
         {0xD5, 32,{0x00,0x00,0x00,0x00,0x0A,0x00,0x01,0x00,
@@ -91,7 +91,7 @@ static struct LCM_setting_table lcm_initialization_setting[] = {
 
     #endif
 
-        #if 0  //p4
+        #if 1  //p4
         {0xB9, 3, {0xFF,0x83,0x94}},
         {0xBA, 16,{0x13,0x82,0x00,0x16,0xC5,0x40,//6th 00
                     0x10,0xFF,0x0F,0x24,0x03,0x21,
@@ -160,7 +160,7 @@ static struct LCM_setting_table lcm_resume_setting[] = {
 
 
 #ifdef CONFIG_TEGRA_DC_CMU
-static struct tegra_dc_cmu dsi_hx8394a_720p_cmu = {
+static struct tegra_dc_cmu dsi_hx8394a_720p_p4_cmu = {
 	/* lut1 maps sRGB to linear space. */
 	{
 		0,    1,    2,    4,    5,    6,    7,    9,
@@ -328,7 +328,7 @@ static struct tegra_dc_cmu dsi_hx8394a_720p_cmu = {
 };
 #endif
 
-static tegra_dc_bl_output dsi_hx8394a_720p_max8831_bl_response_curve = {
+static tegra_dc_bl_output dsi_hx8394a_720p_p4_max8831_bl_response_curve = {
 	0, 1, 3, 5, 7, 9, 11, 13,
 	15, 17, 19, 21, 22, 23, 25, 26,
 	28, 29, 30, 32, 33, 34, 36, 37,
@@ -363,7 +363,7 @@ static tegra_dc_bl_output dsi_hx8394a_720p_max8831_bl_response_curve = {
 	247, 247, 248, 250, 251, 252, 253, 255
 };
 
-static tegra_dc_bl_output dsi_hx8394a_720p_lm3528_bl_response_curve = {
+static tegra_dc_bl_output dsi_hx8394a_720p_p4_lm3528_bl_response_curve = {
 	1, 33, 61, 77, 88, 97, 105, 111,
 	116, 121, 125, 129, 132, 136, 139, 141,
 	144, 146, 149, 151, 153, 155, 157, 158,
@@ -435,11 +435,11 @@ static tegra_dc_bl_output temp_bl_output_measured = {
 
 static p_tegra_dc_bl_output bl_output;
 
-static p_tegra_dc_bl_output dsi_hx8394a_720p_bl_response_curve;
+static p_tegra_dc_bl_output dsi_hx8394a_720p_p4_bl_response_curve;
 
-static struct tegra_dsi_out dsi_hx8394a_720p_pdata;
+static struct tegra_dsi_out dsi_hx8394a_720p_p4_pdata;
 
-static int __maybe_unused dsi_hx8394a_720p_bl_notify(struct device *unused,
+static int __maybe_unused dsi_hx8394a_720p_p4_bl_notify(struct device *unused,
 							int brightness)
 {
 	int cur_sd_brightness = atomic_read(&sd_brightness);
@@ -451,11 +451,11 @@ static int __maybe_unused dsi_hx8394a_720p_bl_notify(struct device *unused,
 	if (brightness > 255)
 		pr_info("Error: Brightness > 255!\n");
 	else
-		brightness = dsi_hx8394a_720p_bl_response_curve[brightness];
+		brightness = dsi_hx8394a_720p_p4_bl_response_curve[brightness];
 
 	return brightness;
 }
-static bool __maybe_unused dsi_hx8394a_720p_check_bl_power(void)
+static bool __maybe_unused dsi_hx8394a_720p_p4_check_bl_power(void)
 {
 	return is_bl_powered;
 }
@@ -463,7 +463,7 @@ static bool __maybe_unused dsi_hx8394a_720p_check_bl_power(void)
 /*
 	LG uses I2C max8831 blacklight device
 */
-static struct led_info dsi_hx8394a_720p_max8831_leds[] = {
+static struct led_info dsi_hx8394a_720p_p4_max8831_leds[] = {
 	[MAX8831_ID_LED3] = {
 		.name = "max8831:red:pluto",
 	},
@@ -475,60 +475,60 @@ static struct led_info dsi_hx8394a_720p_max8831_leds[] = {
 	},
 };
 
-static struct platform_max8831_backlight_data dsi_hx8394a_720p_max8831_bl_data = {
+static struct platform_max8831_backlight_data dsi_hx8394a_720p_p4_max8831_bl_data = {
 	.id	= -1,
 	.name	= "pluto_display_bl",
 	.max_brightness	= MAX8831_BL_LEDS_MAX_CURR,
 	.dft_brightness	= 100,
-	.notify	= dsi_hx8394a_720p_bl_notify,
-	.is_powered = dsi_hx8394a_720p_check_bl_power,
+	.notify	= dsi_hx8394a_720p_p4_bl_notify,
+	.is_powered = dsi_hx8394a_720p_p4_check_bl_power,
 };
 
-static struct max8831_subdev_info dsi_hx8394a_720p_max8831_subdevs[] = {
+static struct max8831_subdev_info dsi_hx8394a_720p_p4_max8831_subdevs[] = {
 	{
 		.id = MAX8831_ID_LED3,
 		.name = "max8831_led_bl",
-		.platform_data = &dsi_hx8394a_720p_max8831_leds[MAX8831_ID_LED3],
+		.platform_data = &dsi_hx8394a_720p_p4_max8831_leds[MAX8831_ID_LED3],
 		.pdata_size = sizeof(
-				dsi_hx8394a_720p_max8831_leds[MAX8831_ID_LED3]),
+				dsi_hx8394a_720p_p4_max8831_leds[MAX8831_ID_LED3]),
 	}, {
 		.id = MAX8831_ID_LED4,
 		.name = "max8831_led_bl",
-		.platform_data = &dsi_hx8394a_720p_max8831_leds[MAX8831_ID_LED4],
+		.platform_data = &dsi_hx8394a_720p_p4_max8831_leds[MAX8831_ID_LED4],
 		.pdata_size = sizeof(
-				dsi_hx8394a_720p_max8831_leds[MAX8831_ID_LED4]),
+				dsi_hx8394a_720p_p4_max8831_leds[MAX8831_ID_LED4]),
 	}, {
 		.id = MAX8831_ID_LED5,
 		.name = "max8831_led_bl",
-		.platform_data = &dsi_hx8394a_720p_max8831_leds[MAX8831_ID_LED5],
+		.platform_data = &dsi_hx8394a_720p_p4_max8831_leds[MAX8831_ID_LED5],
 		.pdata_size = sizeof(
-				dsi_hx8394a_720p_max8831_leds[MAX8831_ID_LED5]),
+				dsi_hx8394a_720p_p4_max8831_leds[MAX8831_ID_LED5]),
 	}, {
 		.id = MAX8831_BL_LEDS,
 		.name = "max8831_display_bl",
-		.platform_data = &dsi_hx8394a_720p_max8831_bl_data,
-		.pdata_size = sizeof(dsi_hx8394a_720p_max8831_bl_data),
+		.platform_data = &dsi_hx8394a_720p_p4_max8831_bl_data,
+		.pdata_size = sizeof(dsi_hx8394a_720p_p4_max8831_bl_data),
 	},
 };
 
-static struct max8831_platform_data dsi_hx8394a_720p_max8831 = {
-	.num_subdevs = ARRAY_SIZE(dsi_hx8394a_720p_max8831_subdevs),
-	.subdevs = dsi_hx8394a_720p_max8831_subdevs,
+static struct max8831_platform_data dsi_hx8394a_720p_p4_max8831 = {
+	.num_subdevs = ARRAY_SIZE(dsi_hx8394a_720p_p4_max8831_subdevs),
+	.subdevs = dsi_hx8394a_720p_p4_max8831_subdevs,
 };
 
-static struct i2c_board_info dsi_hx8394a_720p_i2c_led_info = {
+static struct i2c_board_info dsi_hx8394a_720p_p4_i2c_led_info = {
 	.type		= "max8831",
 	.addr		= 0x4d,
-	.platform_data	= &dsi_hx8394a_720p_max8831,
+	.platform_data	= &dsi_hx8394a_720p_p4_max8831,
 };
 
 static struct lm3528_platform_data lm3528_pdata = {
 	.dft_brightness	= 100,
-	.is_powered = dsi_hx8394a_720p_check_bl_power,
-	.notify	= dsi_hx8394a_720p_bl_notify,
+	.is_powered = dsi_hx8394a_720p_p4_check_bl_power,
+	.notify	= dsi_hx8394a_720p_p4_bl_notify,
 };
 
-static struct i2c_board_info lm3528_dsi_hx8394a_720p_i2c_led_info = {
+static struct i2c_board_info lm3528_dsi_hx8394a_720p_p4_i2c_led_info = {
 	.type		= "lm3528_display_bl",
 	.addr		= 0x36,
 	.platform_data	= &lm3528_pdata,
@@ -641,14 +641,14 @@ static struct platform_device *hx8394a_gfx_devices[] __initdata = {
 	&tegra_pwfm0_device,
 };
 
-static int __init dsi_hx8394a_720p_register_bl_dev(void)
+static int __init dsi_hx8394a_720p_p4_register_bl_dev(void)
 {
-	dsi_hx8394a_720p_max8831_bl_data.edp_states =
+	dsi_hx8394a_720p_p4_max8831_bl_data.edp_states =
 		dsi_l_ceres_edp_states;
-	dsi_hx8394a_720p_max8831_bl_data.edp_brightness =
+	dsi_hx8394a_720p_p4_max8831_bl_data.edp_brightness =
 			dsi_l_ceres_edp_brightness;
-		dsi_hx8394a_720p_bl_response_curve =
-				dsi_hx8394a_720p_max8831_bl_response_curve;	
+		dsi_hx8394a_720p_p4_bl_response_curve =
+				dsi_hx8394a_720p_p4_max8831_bl_response_curve;	
 	bl_output = temp_bl_output_measured;
 
 	platform_add_devices(hx8394a_gfx_devices,
@@ -664,7 +664,7 @@ static int __init dsi_hx8394a_720p_register_bl_dev(void)
 }
 
 //1366 (V) 1062 (H) 65281140
-struct tegra_dc_mode dsi_hx8394a_720p_modes[] = {
+struct tegra_dc_mode dsi_hx8394a_720p_p4_modes[] = {
 	{
 		.pclk = 66700000,//67900000,//86750000,//74180000,
 //		.pclk = 66700000,
@@ -683,11 +683,11 @@ struct tegra_dc_mode dsi_hx8394a_720p_modes[] = {
 
 
 
-static int dsi_hx8394a_720p_reg_get(void)
+static int dsi_hx8394a_720p_p4_reg_get(void)
 {
 	int err = 0;
 
-	if (dsi_hx8394a_720p_reg_requested)
+	if (dsi_hx8394a_720p_p4_reg_requested)
 		return 0;
 
 	avdd_lcd_3v0_2v8 = regulator_get(NULL, "avdd_lcd");
@@ -715,37 +715,37 @@ static int dsi_hx8394a_720p_reg_get(void)
 		goto fail;
 	} 
 
-	dsi_hx8394a_720p_reg_requested = true;
+	dsi_hx8394a_720p_p4_reg_requested = true;
 	return 0;
 fail:
 	return err;
 }
 
-static int dsi_hx8394a_720p_gpio_get(void)
+static int dsi_hx8394a_720p_p4_gpio_get(void)
 {
 	int err = 0;
 
-	if (dsi_hx8394a_720p_gpio_requested)
+	if (dsi_hx8394a_720p_p4_gpio_requested)
 		return 0;
 
-	err = gpio_request(dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio,
+	err = gpio_request(dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio,
 		"panel rst");
 	if (err < 0) {
 		printk("panel reset gpio request failed\n");
 //Ivan		goto fail;
 	}
-	//printk("Ivan hx8394a dsi_panel_rst_gpio = %d \n", dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio);
+	//printk("Ivan hx8394a dsi_panel_rst_gpio = %d \n", dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio);
 
-	err = gpio_request(dsi_hx8394a_720p_pdata.dsi_panel_bl_en_gpio,
+	err = gpio_request(dsi_hx8394a_720p_p4_pdata.dsi_panel_bl_en_gpio,
 		"panel backlight");
 	if (err < 0) {
 		printk("panel backlight gpio request failed\n");
 //Ivan		goto fail;
 	}
-	//printk("Ivan hx8394a dsi_panel_bl_en_gpio = %d \n", dsi_hx8394a_720p_pdata.dsi_panel_bl_en_gpio);
+	//printk("Ivan hx8394a dsi_panel_bl_en_gpio = %d \n", dsi_hx8394a_720p_p4_pdata.dsi_panel_bl_en_gpio);
 	
 /*
-	err = gpio_request(dsi_hx8394a_720p_pdata.dsi_panel_bl_pwm_gpio,
+	err = gpio_request(dsi_hx8394a_720p_p4_pdata.dsi_panel_bl_pwm_gpio,
 		"panel pwm");
 	if (err < 0) {
 		printk("panel backlight pwm gpio request failed\n");
@@ -753,7 +753,7 @@ static int dsi_hx8394a_720p_gpio_get(void)
 //Ivan		goto fail;
 	}
 */
-	dsi_hx8394a_720p_gpio_requested = true;
+	dsi_hx8394a_720p_p4_gpio_requested = true;
 	return 0;
 //fail:
 //	return err;
@@ -764,18 +764,18 @@ static int dsi_hx8394a_720p_gpio_get(void)
 *	turn off backlight before lcm_init when boot on
 *	excute just one time;
 *******************************************************/
-static int dsi_hx8394a_720p_enable(struct device *dev)
+static int dsi_hx8394a_720p_p4_enable(struct device *dev)
 {
 	int err = 0;
 
-	//printk("Ivan dsi_hx8394a_720p_enable\n");
-	err = dsi_hx8394a_720p_reg_get();
+	//printk("Ivan dsi_hx8394a_720p_p4_enable\n");
+	err = dsi_hx8394a_720p_p4_reg_get();
 	if (err < 0) {
 		//printk("dsi regulator get failed\n");
 		goto fail;
 	}
 
-	err = dsi_hx8394a_720p_gpio_get();
+	err = dsi_hx8394a_720p_p4_gpio_get();
 	if (err < 0) {
 		printk("dsi gpio request failed\n");
 		goto fail;
@@ -789,7 +789,7 @@ static int dsi_hx8394a_720p_enable(struct device *dev)
 	else
 	{
 		if (is_in_initialized_mode)
-			gpio_direction_output(dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio, 0);
+			gpio_direction_output(dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio, 0);
 	    
 	}
 	
@@ -827,23 +827,23 @@ static int dsi_hx8394a_720p_enable(struct device *dev)
 	usleep_range(3000, 5000);  
 
 /*	gpio_direction_output(
-		dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio, 1);
+		dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio, 1);
 	usleep_range(1000, 5000);
 
 	gpio_direction_output(
-		dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio, 0);	
+		dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio, 0);	
 	usleep_range(1000, 5000);
 
 	*/
 	
 #if 0//def DSI_PANEL_RESET
 	gpio_direction_output(
-		dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio, 1);	
+		dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio, 1);	
 	msleep(20);
 #endif
 
 	/* enable backlight */
-	//gpio_direction_output(dsi_hx8394a_720p_pdata.dsi_panel_bl_en_gpio, 1);	
+	//gpio_direction_output(dsi_hx8394a_720p_p4_pdata.dsi_panel_bl_en_gpio, 1);	
 
 	is_bl_powered = true;
 	is_in_initialized_mode = true;
@@ -852,11 +852,11 @@ fail:
 	return err;
 }
 
-static int dsi_hx8394a_720p_hw_reset(struct device *dev)
+static int dsi_hx8394a_720p_p4_hw_reset(struct device *dev)
 {
 
 	gpio_direction_output(
-		dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio, 1);
+		dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio, 1);
 	return 0;
 }
 
@@ -870,22 +870,22 @@ static int dsi_hx8394a_720p_hw_reset(struct device *dev)
 //Ivan static u8 s_ParaDisplayOn[] = {0x29};
 
 
-static int dsi_hx8394a_720p_disable(void)
+static int dsi_hx8394a_720p_p4_disable(void)
 {
-	//printk("geroge dsi_hx8394a_720p_disable\n");
+	//printk("geroge dsi_hx8394a_720p_p4_disable\n");
     
 /*	if (gpio_is_valid(panel_of.panel_gpio[TEGRA_GPIO_BL_ENABLE]))
 	{
 		gpio_direction_output(
 			panel_of.panel_gpio[TEGRA_GPIO_BL_ENABLE], 0);
-	    printk("Ivan dsi_hx8394a_720p_disable 1 \n");
+	    printk("Ivan dsi_hx8394a_720p_p4_disable 1 \n");
 		
 	}
 	else
 	{
 		gpio_direction_output(
-			dsi_hx8394a_720p_pdata.dsi_panel_bl_en_gpio, 0);
-	    printk("Ivan dsi_hx8394a_720p_disable 2 \n");
+			dsi_hx8394a_720p_p4_pdata.dsi_panel_bl_en_gpio, 0);
+	    printk("Ivan dsi_hx8394a_720p_p4_disable 2 \n");
 		
 	}  
 	*/
@@ -897,7 +897,7 @@ static int dsi_hx8394a_720p_disable(void)
 			panel_of.panel_gpio[TEGRA_GPIO_RESET], 0);}
 	else{
 		gpio_direction_output(
-			dsi_hx8394a_720p_pdata.dsi_panel_rst_gpio, 0);
+			dsi_hx8394a_720p_p4_pdata.dsi_panel_rst_gpio, 0);
                }
 
 	if (vdd_sys_bl_3v7)
@@ -912,7 +912,7 @@ static int dsi_hx8394a_720p_disable(void)
 	return 0;
 }
 
-static struct tegra_dsi_out dsi_hx8394a_720p_pdata = {
+static struct tegra_dsi_out dsi_hx8394a_720p_p4_pdata = {
 	.n_data_lanes = 4,
 
 	.refresh_rate = 60,
@@ -927,68 +927,68 @@ static struct tegra_dsi_out dsi_hx8394a_720p_pdata = {
 
 	.panel_reset = DSI_PANEL_RESET,
 	.power_saving_suspend = true,
-//	.dsi_init_cmd = dsi_hx8394a_720p_init,
-//	.n_init_cmd = ARRAY_SIZE(dsi_hx8394a_720p_init),
+//	.dsi_init_cmd = dsi_hx8394a_720p_p4_init,
+//	.n_init_cmd = ARRAY_SIZE(dsi_hx8394a_720p_p4_init),
 };
 
-static void dsi_hx8394a_720p_dc_out_init(struct tegra_dc_out *dc)
+static void dsi_hx8394a_720p_p4_dc_out_init(struct tegra_dc_out *dc)
 {
 	//edit by Magnum 2013-11-14
 	u16 init_count = sizeof(lcm_initialization_setting)/sizeof(struct LCM_setting_table);
-	rebuild_tegra_lcm(lcm_initialization_setting, &dsi_hx8394a_720p_pdata,init_count);
+	rebuild_tegra_lcm(lcm_initialization_setting, &dsi_hx8394a_720p_p4_pdata,init_count);
 #if 0
 	init_count = sizeof(lcm_suspend_setting)/sizeof(struct LCM_setting_table);
-	rebuild_tegra_lcm_suspend(lcm_suspend_setting, &dsi_hx8394a_720p_pdata,init_count);
+	rebuild_tegra_lcm_suspend(lcm_suspend_setting, &dsi_hx8394a_720p_p4_pdata,init_count);
 	init_count = sizeof(lcm_resume_setting)/sizeof(struct LCM_setting_table);
-	rebuild_tegra_lcm_resume(lcm_resume_setting, &dsi_hx8394a_720p_pdata,init_count);
+	rebuild_tegra_lcm_resume(lcm_resume_setting, &dsi_hx8394a_720p_p4_pdata,init_count);
 #endif
-	dc->dsi = &dsi_hx8394a_720p_pdata;
+	dc->dsi = &dsi_hx8394a_720p_p4_pdata;
 	dc->parent_clk = "pll_d_out0";
-	dc->modes = dsi_hx8394a_720p_modes;
-	dc->n_modes = ARRAY_SIZE(dsi_hx8394a_720p_modes);
-	dc->enable = dsi_hx8394a_720p_enable;
-	dc->hw_reset = dsi_hx8394a_720p_hw_reset;
-	dc->disable = dsi_hx8394a_720p_disable;
+	dc->modes = dsi_hx8394a_720p_p4_modes;
+	dc->n_modes = ARRAY_SIZE(dsi_hx8394a_720p_p4_modes);
+	dc->enable = dsi_hx8394a_720p_p4_enable;
+	dc->hw_reset = dsi_hx8394a_720p_p4_hw_reset;
+	dc->disable = dsi_hx8394a_720p_p4_disable;
 	dc->width = 62;
 	dc->height = 110;
 	//dc->flags = DC_CTRL_MODE;
 	dc->flags = DC_CTRL_MODE | TEGRA_DC_OUT_INITIALIZED_MODE;
 	is_in_initialized_mode = false;
 }
-static void dsi_hx8394a_720p_fb_data_init(struct tegra_fb_data *fb)
+static void dsi_hx8394a_720p_p4_fb_data_init(struct tegra_fb_data *fb)
 {
-	fb->xres = dsi_hx8394a_720p_modes[0].h_active;
-	fb->yres = dsi_hx8394a_720p_modes[0].v_active;
+	fb->xres = dsi_hx8394a_720p_p4_modes[0].h_active;
+	fb->yres = dsi_hx8394a_720p_p4_modes[0].v_active;
 }
 
-static void dsi_hx8394a_720p_sd_settings_init(struct tegra_dc_sd_settings *settings)
+static void dsi_hx8394a_720p_p4_sd_settings_init(struct tegra_dc_sd_settings *settings)
 {
 	struct board_info bi;
 	tegra_get_display_board_info(&bi);
 	settings->bl_device_name = "pwm-backlight";
 }
 
-static void dsi_hx8394a_720p_set_disp_device(
+static void dsi_hx8394a_720p_p4_set_disp_device(
 	struct platform_device *ceres_display_device)
 {
 	disp_device = ceres_display_device;
 }
 
 #ifdef CONFIG_TEGRA_DC_CMU
-static void dsi_hx8394a_720p_cmu_init(struct tegra_dc_platform_data *pdata)
+static void dsi_hx8394a_720p_p4_cmu_init(struct tegra_dc_platform_data *pdata)
 {
-	pdata->cmu = &dsi_hx8394a_720p_cmu;
+	pdata->cmu = &dsi_hx8394a_720p_p4_cmu;
 }
 #endif
 
-struct tegra_panel __initdata dsi_hx8394a_720p = {
-	.init_sd_settings = dsi_hx8394a_720p_sd_settings_init,
-	.init_dc_out = dsi_hx8394a_720p_dc_out_init,
-	.init_fb_data = dsi_hx8394a_720p_fb_data_init,
-	.register_bl_dev = dsi_hx8394a_720p_register_bl_dev,
-	.set_disp_device = dsi_hx8394a_720p_set_disp_device,	
+struct tegra_panel __initdata dsi_hx8394a_720p_p4 = {
+	.init_sd_settings = dsi_hx8394a_720p_p4_sd_settings_init,
+	.init_dc_out = dsi_hx8394a_720p_p4_dc_out_init,
+	.init_fb_data = dsi_hx8394a_720p_p4_fb_data_init,
+	.register_bl_dev = dsi_hx8394a_720p_p4_register_bl_dev,
+	.set_disp_device = dsi_hx8394a_720p_p4_set_disp_device,	
 #ifdef CONFIG_TEGRA_DC_CMU
-	.init_cmu_data = dsi_hx8394a_720p_cmu_init,
+	.init_cmu_data = dsi_hx8394a_720p_p4_cmu_init,
 #endif
 };
-EXPORT_SYMBOL(dsi_hx8394a_720p);
+EXPORT_SYMBOL(dsi_hx8394a_720p_p4);

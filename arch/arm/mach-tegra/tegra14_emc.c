@@ -2006,17 +2006,18 @@ int tegra_emc_get_dram_temperature(void)
 	int mr4 = 0, mr4_prev, i = 0;
 	unsigned long flags;
 
-	spin_lock_irqsave(&emc_access_lock, flags);
 
 	/* Once we hit two consecutive reads that return the same value we
 	 * assume things are good. */
 	do {
 		mr4_prev = mr4;
+		spin_lock_irqsave(&emc_access_lock, flags);
 		mr4 = emc_read_mrr(0, 4);
 		if (IS_ERR_VALUE(mr4)) {
 			spin_unlock_irqrestore(&emc_access_lock, flags);
 			return mr4;
 		}
+		spin_unlock_irqrestore(&emc_access_lock, flags);
 
 		i++;
 	} while ((i < 2 || mr4 != mr4_prev) && i < 10);
@@ -2029,8 +2030,6 @@ int tegra_emc_get_dram_temperature(void)
 		pr_err("emc: Failed to read MR4!\n");
 		return -ENODATA;
 	}
-
-	spin_unlock_irqrestore(&emc_access_lock, flags);
 
 	return (mr4 & LPDDR2_MR4_TEMP_MASK) >> LPDDR2_MR4_TEMP_SHIFT;
 }
@@ -2303,7 +2302,7 @@ static int dram_emc_name_get(void *data, char *val)
 {
 	if (emc_mrs_id == EMC_MRS_EDF8132A1MC && sku_id == 0x7)
 		*val = "Elpida";
-	else if (emc_mrs_id == EMC_MRS_K4E8E304ED && sku_id == 0x7)
+	else if (emc_mrs_id == EMC_MRS_K4E8E304ED && (sku_id == 0x7 || sku_id == 0x3))  //LIUJ201140504RELE1315ADDO support 460 cpu
 		*val = "Samsung";
 	else if (emc_mrs_id == EMC_MRS_H9TQ18ABJTMC && sku_id == 0x83)
 		*val = "Hynix";

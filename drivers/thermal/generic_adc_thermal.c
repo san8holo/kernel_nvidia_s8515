@@ -309,8 +309,9 @@ static int __devinit gadc_thermal_probe(struct platform_device *pdev)
 		goto error_release_channel;
 	}
 
+#ifdef CONFIG_DEBUG_FS
 	gadc_thermal_debugfs_init(drvdata);
-
+#endif
 	return 0;
 
 error_release_channel:

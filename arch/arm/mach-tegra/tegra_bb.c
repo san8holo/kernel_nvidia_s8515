@@ -40,6 +40,7 @@
 #include <mach/tegra_bb.h>
 #include <mach/tegra_bbc_proxy.h>
 #include <mach/tegra_bbc_power.h>
+#include <mach/pm_domains.h>
 #include <linux/platform_data/nvshm.h>
 
 #include "clock.h"
@@ -166,7 +167,9 @@ struct tegra_bb {
 unsigned int bb_emc_set_s_stats[MAX_SMALL_STAT_TIME/SMALL_STAT_STEP];
 unsigned int bb_emc_set_l_stats[32];
 static int max_emc_set_latency;
+#ifdef CONFIG_DEBUG_FS
 static void dump_emc_set_stats(void);
+#endif
 
 static int tegra_bb_open(struct inode *inode, struct file *filp);
 static int tegra_bb_map(struct file *filp, struct vm_area_struct *vma);
@@ -1027,7 +1030,9 @@ static void tegra_bb_set_emc(struct tegra_bb *bb)
 		tegra_bbc_proxy_edp_request(bb->proxy_dev, 0, BBC_EDP_E0_INDEX,
 						BBC_EDP_E0_THRESHOLD);
 
+#ifdef CONFIG_DEBUG_FS
 		dump_emc_set_stats();
+#endif
 
 		return;
 	default:
@@ -1161,7 +1166,7 @@ static int tegra_bb_probe(struct platform_device *pdev)
 		kfree(bb);
 		return -ENOMEM;
 	}
-
+	bb->cpu_min_freq = BBC_CPU_MIN_FREQ;
 	pm_qos_add_request(&bb_cpufreq_min_req, PM_QOS_CPU_FREQ_MIN,
 		PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
 
@@ -1624,6 +1629,7 @@ int bb_emc_set_stats_show(struct seq_file *s, void *data)
 	return 0;
 }
 
+#ifdef CONFIG_DEBUG_FS
 static void dump_emc_set_stats(void)
 {
 	int bin, total;
@@ -1654,7 +1660,7 @@ static void dump_emc_set_stats(void)
 	pr_info("%18s: %8u\n", "TOTAL", total);
 	pr_info("\n");
 }
-
+#endif
 static int bb_emc_set_stats_open(struct inode *inode, struct file *file)
 {
 	return single_open(file, bb_emc_set_stats_show,

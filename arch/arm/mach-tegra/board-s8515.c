@@ -314,7 +314,8 @@ static struct tegra_asoc_platform_data ceres_audio_max98090_pdata = {
 	.i2s_param[HIFI_CODEC]	= {
 		.audio_port_id	= 0,
 		.is_i2s_master	= 1,
-		.i2s_mode	= TEGRA_DAIFMT_DSP_A,
+		//.i2s_mode	= TEGRA_DAIFMT_DSP_A,
+		.i2s_mode	= TEGRA_DAIFMT_I2S,//FM testing
 		.sample_size	= 16,
 		.channels       = 2,
 		.bit_clk	= 1536000,
@@ -487,6 +488,11 @@ static struct platform_device tegra_bbc_proxy_device = {
 	.dev = {
 		.platform_data = &bbc_proxy_pdata,
 	},
+};
+
+static struct platform_device tegra_rtc_sysfs_device = {
+	.name = "tegra_rtc_sysfs",
+	.id = -1,
 };
 
 #if defined(CONFIG_TEGRA_WAKEUP_MONITOR)
@@ -1137,6 +1143,7 @@ static void __init sysedp_psydepl_init(void)
 
 static void __init tegra_ceres_late_init(void)
 {
+	platform_device_register(&tegra_rtc_sysfs_device);
 	platform_device_register(&tegra_pinmux_device);
 	ceres_pinmux_init();
 #if defined(CONFIG_TEGRA_BASEBAND)
@@ -1199,39 +1206,6 @@ static void __init tegra_ceres_dt_init(void)
 
 	tegra_ceres_late_init();
 }
-
-void tegra_debug_writec(unsigned int c)
-{
-        void __iomem *debug_port_base_addr;
-        unsigned int tmp = 0;
-
-#define DEBUG_PORT_BASE_ADDRESS  (0x70006000)
-
-	debug_port_base_addr = IO_ADDRESS(DEBUG_PORT_BASE_ADDRESS);
-
-        //tegra_write(t, c, UART_TX);
-        //tegra_write(t, UART_IER_RLSI | UART_IER_RDI, UART_IER);
-        //tegra_write(t, 0, UART_IIR);
-
-        __raw_writeb((UART_IER_RLSI | UART_IER_RDI), (debug_port_base_addr + UART_TX * 4));
-
-        __raw_writeb(0, debug_port_base_addr + UART_IIR * 4);
-
-        /* Clear LCR.DLAB bit */
-        tmp = __raw_readb(debug_port_base_addr + UART_LCR * 4);
-
-        tmp = tmp & 0x7f;
-        __raw_writeb(tmp, (debug_port_base_addr + UART_LCR * 4));
-
-        udelay(10);
-
-        __raw_writeb(c, debug_port_base_addr + UART_TX * 4);
-
-        udelay(1000);
-
-        iounmap(debug_port_base_addr);
-}
-EXPORT_SYMBOL_GPL(tegra_debug_writec);
 
 static void __init tegra_ceres_reserve(void)
 {

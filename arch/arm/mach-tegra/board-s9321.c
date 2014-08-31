@@ -502,6 +502,11 @@ static struct platform_device tegra_bbc_proxy_device = {
 	},
 };
 
+static struct platform_device tegra_rtc_sysfs_device = {
+	.name = "tegra_rtc_sysfs",
+	.id = -1,
+};
+
 #if defined(CONFIG_TEGRA_WAKEUP_MONITOR)
 static struct tegra_wakeup_monitor_platform_data
 			ceres_tegra_wakeup_monitor_pdata = {
@@ -610,6 +615,8 @@ static void ceres_audio_init(void)
 		gpio_direction_input(AUD_INT);
 
 		pdata->irq = gpio_to_irq(AUD_INT);
+
+		pdata->liq = TEGRA_GPIO_HP_DET;
 #endif
 		i2c_register_board_info(5, &max98090_board_info, 1);
 		platform_add_devices(ceres_only_audio_devices,
@@ -1232,6 +1239,7 @@ static void __init sysedp_psydepl_init(void)
 
 static void __init tegra_ceres_late_init(void)
 {
+	platform_device_register(&tegra_rtc_sysfs_device);
 	platform_device_register(&tegra_pinmux_device);
 	ceres_pinmux_init();
 #if defined(CONFIG_TEGRA_BASEBAND)
@@ -1256,7 +1264,9 @@ static void __init tegra_ceres_late_init(void)
 	ceres_sdhci_init();
 	platform_add_devices(ceres_devices, ARRAY_SIZE(ceres_devices));
 	tegra_ram_console_debug_init();
-	tegra_serial_debug_init(TEGRA_UARTA_BASE, INT_WDT_CPU, NULL, -1, -1);
+#ifdef CONFIG_TEGRA_FIQ_DEBUGGER
+	tegra_serial_debug_init(TEGRA_UARTA_BASE, INT_WDT_AVP, NULL, -1, -1);
+#endif
 	ceres_emc_init();
 	ceres_edp_init();
 	isomgr_init();
@@ -1277,7 +1287,9 @@ static void __init tegra_ceres_late_init(void)
 #endif
 	  ceres_audio_init();
 	}
+#ifdef S8515_HAS_PMON
 	ceres_pmon_init();
+#endif
 	ceres_sysedp_core_init();
 	sysedp_psydepl_init();
 }

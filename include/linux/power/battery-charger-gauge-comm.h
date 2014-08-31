@@ -2,7 +2,7 @@
  * battery-charger-gauge-comm.h -- Communication APIS between battery charger
  *		and battery gauge driver.
  *
- * Copyright (c) 2013-2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2013, NVIDIA Corporation.
  *
  * Author: Laxman Dewangan <ldewangan@nvidia.com>
  *
@@ -85,7 +85,6 @@ void battery_charger_set_drvdata(struct battery_charger_dev *bc_dev,
 			void *data);
 void *battery_gauge_get_drvdata(struct battery_gauge_dev *bg_dev);
 void battery_gauge_set_drvdata(struct battery_gauge_dev *bg_dev, void *data);
-
 int battery_set_charging(struct battery_gauge_dev *bg_dev,
 	bool enable);
 

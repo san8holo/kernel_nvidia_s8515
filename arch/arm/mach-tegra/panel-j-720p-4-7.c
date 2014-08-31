@@ -243,7 +243,7 @@ fail:
 static int dsi_j_720p_4_7_enable(struct device *dev)
 {
 	int err = 0;
-
+	
 	err = dsi_j_720p_4_7_reg_get();
 	if (err < 0) {
 		pr_err("dsi regulator get failed\n");

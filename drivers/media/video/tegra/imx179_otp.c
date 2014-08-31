@@ -81,7 +81,7 @@ int IMX179_ReadWbFromOtp(struct imx179_info *info)
 
 	IMX179_ReadOtp(info, tempbank, address, Temp, 42);
 
-	if (Temp[6] != MID_Sunny || Temp[7] != LensID_Sunny || Temp[8] != VcmID_Sunny)	//????MID
+	if (Temp[6] != MID_Sunny || Temp[7] != LensID_Sunny || Temp[8] != VcmID_Sunny)
 	{
 		return false;
 	}
@@ -106,7 +106,7 @@ int IMX179_ReadAfmacroFromOtp(struct imx179_info *info)
 	int tempbank = 0;
 	int af_macro = 0;
 
-	for (i = 0; i < 3; i++)	//?? otp ????
+	for (i = 0; i < 3; i++)
 	{
 		IMX179MIPI_write_cmos_sensor(info, 0x3380, 0x00);	//ECC OFF
 		IMX179MIPI_write_cmos_sensor(info, 0x3400, 0x01);	//enable RW
@@ -172,9 +172,8 @@ int IMX179_ReadAfinfFromOtp(struct imx179_info *info)
 //iBuffer:the return data buffer
 //buffersize: buffer size
 int IMX179_ReadOtp(struct imx179_info *info, u16 tempbank, u16 address,
-u8 *iBuffer, u16 buffersize)
+		   		   u8 * iBuffer, u16 buffersize)
 {
-
 	int i;
 	u8 reVal;
 	IMX179MIPI_write_cmos_sensor(info, 0x3380, 0x00);

@@ -136,6 +136,7 @@ static struct tegra_dc_sd_settings sd_settings;
 static struct tegra_dc_out ceres_disp1_out = {
 	.type		= TEGRA_DC_OUT_DSI,
 	.sd_settings	= &sd_settings,
+	.refresh_rate   = 60000,	/* 60Hz */
 };
 
 static int ceres_hdmi_enable(struct device *dev)
@@ -424,8 +425,12 @@ static void ceres_panel_select(void)
 
 	if (tegra_get_board_panel_id()==11) {  //LIUJ201140504RELE1315ADDO adc select lcd
 		panel = &dsi_hx8394a_720p;
-                panel_name = "Tcl_hx8394_HD_video_24bit\n";
-	} else {
+                panel_name = "Tcl_hx8394_p3_HD_video_24bit\n";
+	}else if(tegra_get_board_panel_id()==12) {
+
+                panel = &dsi_hx8394a_720p_p4;
+                panel_name = "Tcl_hx8394_p4_HD_video_24bit\n";
+        }else {
 		panel = &dsi_otm1283a_720p;
                 panel_name = "Truly_otm1283a_HD_video_24bit\n";
 	}

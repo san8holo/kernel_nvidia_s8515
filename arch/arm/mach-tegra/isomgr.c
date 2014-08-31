@@ -44,7 +44,7 @@
 #include <trace/events/isomgr.h>
 
 #define ISOMGR_SYSFS_VERSION 0	/* increment on change */
-#define ISOMGR_DEBUG 1
+#define ISOMGR_DEBUG 0
 
 #if ISOMGR_DEBUG
 #define SANITY_CHECK_AVAIL_BW() { \
@@ -188,7 +188,13 @@ static struct isoclient_info *get_iso_client_info(void)
 		break;
 	case TEGRA_CHIPID_TEGRA14:
 		cinfo = tegra14x_isoclients;
-		iso_bw_percentage = 45;
+		/* iso_bw_percentage = 45; */
+		/*
+			increase it because of the
+			increase for vi to support
+			ZSL for ov16825
+		*/
+		iso_bw_percentage = 52;
 		break;
 	default:
 		cinfo = tegra_null_isoclients;

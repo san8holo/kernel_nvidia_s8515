@@ -2,7 +2,7 @@
  * include/linux/mfd/max77660-core.h
  *
  * Copyright 2011 Maxim Integrated Products, Inc.
- * Copyright (C) 2011-2014 NVIDIA CORPORATION. All rights reserved.
+ * Copyright (C) 2011-2013 NVIDIA CORPORATION. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -276,6 +276,8 @@
 #define SIM_SIM1_2_CNFG1_SIM1DBCNT_MASK (BIT(0) | BIT(1) | BIT(2) \
 				| BIT(3) | BIT(4) | BIT(5))
 #define SIM_SIM1_2_DBCNT        (0x10) /* COUNT=16, table 160 */
+#define SIM_SIM1_2_NMT_ENABLE  (0)
+#define SIM_SIM1_2_NMT_DISABLE (BIT(0) | BIT(1))
 
 #define MAX77660_ADCINT_DTRINT			BIT(1)
 #define MAX77660_ADCINT_DTFINT			BIT(2)
